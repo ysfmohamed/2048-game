@@ -11,6 +11,7 @@
 html,
 body {
   color: var(--main-color);
+  font-family: "Roboto", sans-serif;
 }
 
 .main-container {
