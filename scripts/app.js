@@ -132,6 +132,17 @@ class Logic {
     return newMatrix;
   };
 
+  static generateCell = (matrix) => {
+    let pos = Random.randomize(0, 4);
+
+    while (matrix[pos.row][pos.col].innerHTML !== "") {
+      pos = Random.randomize(0, 4);
+    }
+
+    const cellContent = Random.randomCellContent();
+    matrix[pos.row][pos.col].innerHTML = `<div>${cellContent}</div>`;
+  };
+
   static compress = (matrix) => {
     let pos = 0;
 
@@ -207,18 +218,17 @@ window.addEventListener("keydown", (event) => {
       Logic.moveBlocksToUp(board);
       break;
     case "ArrowDown":
-      console.log("Down");
       Logic.moveBlocksToDown(board);
       break;
     case "ArrowRight":
-      console.log("Right");
       Logic.moveBlocksToRight(board);
       break;
     case "ArrowLeft":
-      console.log("Left");
       Logic.moveBlocksToLeft(board);
       break;
   }
+
+  Logic.generateCell(board);
 });
 
 /* ########## START NEW GAME ########## */
