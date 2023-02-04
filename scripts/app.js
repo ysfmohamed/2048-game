@@ -22,6 +22,8 @@ class Board {
     }
   };
 
+  addColorToCell = (cell) => {};
+
   loadBoardWithGridCells = () => {
     const gridContainer = document.querySelector(".grid-container");
 
@@ -82,14 +84,20 @@ class Random {
       let temp = secondTilePos.row;
       secondTilePos.row = secondTilePos.col;
       secondTilePos.col = temp;
-    } else if (
-      ((firstTilePos.row === firstTilePos.col) === secondTilePos.row) ===
-      secondTilePos.col
+    }
+
+    if (
+      firstTilePos.row === firstTilePos.col &&
+      firstTilePos.col === secondTilePos.row &&
+      secondTilePos.row === secondTilePos.col
     ) {
+      console.log("all equal");
+      console.log(firstTilePos);
+      console.log(secondTilePos);
       if (firstTilePos.row === 3) {
         firstTilePos.row -= 1;
       } else {
-        secondTilePos.row += 1;
+        firstTilePos.row += 1;
       }
     }
 
@@ -159,6 +167,7 @@ class Logic {
       for (let j = 0; j < 4; j++) {
         if (matrix[i][j].innerHTML !== "") {
           matrix[i][pos].innerHTML = matrix[i][j].innerHTML;
+
           if (j !== pos) {
             matrix[i][j].innerHTML = "";
             isChanged = true;
