@@ -172,7 +172,26 @@ class Logic {
     return { matrix, isChanged };
   };
 
+  static getScoreNumContainer = () => {
+    return document.querySelector(".score-num");
+  };
+
+  static getScoreValue = () => {
+    const scoreContainer = this.getScoreNumContainer();
+
+    return parseInt(scoreContainer.innerText);
+  };
+
+  static updateScoreValue = (value) => {
+    let scoreValue = this.getScoreValue();
+
+    return scoreValue + value;
+  };
+
   static merge = (matrix) => {
+    const scoreContainer = this.getScoreNumContainer();
+    let updatedScoreValue = 0;
+
     let isChanged = false;
 
     for (let i = 0; i < 4; i++) {
@@ -181,9 +200,14 @@ class Logic {
           matrix[i][j].innerText === matrix[i][j + 1].innerText &&
           matrix[i][j].innerText !== ""
         ) {
-          let currentValue = parseInt(matrix[i][j].innerText) * 2;
-          matrix[i][j].innerHTML = `<div>${currentValue}</div>`;
+          let mergedValue = parseInt(matrix[i][j].innerText) * 2;
+
+          matrix[i][j].innerHTML = `<div>${mergedValue}</div>`;
           matrix[i][j + 1].innerHTML = "";
+
+          updatedScoreValue = this.updateScoreValue(mergedValue);
+          scoreContainer.innerText = `${updatedScoreValue}`;
+
           isChanged = true;
         }
       }
