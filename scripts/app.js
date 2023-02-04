@@ -64,7 +64,7 @@ class Random {
   constructor() {}
 
   static randomCellContent = () => {
-    return Math.random() > 0.9 ? 2 : 4;
+    return Math.random() > 0.9 ? 4 : 2;
   };
 
   static randomize = (min, max) => {
@@ -101,35 +101,42 @@ class Logic {
   constructor() {}
 
   static moveBlocksToLeft = (matrix) => {
-    let newMatrix = this.compress(matrix);
-    const matrixAfterMerge = this.merge(newMatrix);
-    newMatrix = this.compress(matrixAfterMerge);
+    let changeAfterMove = false;
 
-    return newMatrix;
+    let { isChanged: changeAfterFirstCompress } = this.compress(matrix);
+    let { isChanged: changedAfterMerge } = this.merge(matrix);
+    let { isChanged: changedAfterSecondCompress } = this.compress(matrix);
+
+    if (changeAfterFirstCompress === true || changedAfterMerge === true) {
+      changeAfterMove = true;
+    }
+
+    return { matrix, changeAfterMove };
   };
 
   static moveBlocksToRight = (matrix) => {
-    let newMatrix = this.reverse(matrix);
-    newMatrix = this.moveBlocksToLeft(newMatrix);
-    this.reverse(newMatrix);
+    this.reverse(matrix);
+    let { changeAfterMove } = this.moveBlocksToLeft(matrix);
 
-    return newMatrix;
+    this.reverse(matrix);
+
+    return { matrix, changeAfterMove };
   };
 
   static moveBlocksToUp = (matrix) => {
-    let newMatrix = this.transpose(matrix);
-    newMatrix = this.moveBlocksToLeft(newMatrix);
-    newMatrix = this.transpose(newMatrix);
+    this.transpose(matrix);
+    let { changeAfterMove } = this.moveBlocksToLeft(matrix);
+    this.transpose(matrix);
 
-    return newMatrix;
+    return { matrix, changeAfterMove };
   };
 
   static moveBlocksToDown = (matrix) => {
-    let newMatrix = this.transpose(matrix);
-    newMatrix = this.moveBlocksToRight(matrix);
-    newMatrix = this.transpose(newMatrix);
+    this.transpose(matrix);
+    let { changeAfterMove } = this.moveBlocksToRight(matrix);
+    this.transpose(matrix);
 
-    return newMatrix;
+    return { matrix, changeAfterMove };
   };
 
   static generateCell = (matrix) => {
@@ -145,6 +152,7 @@ class Logic {
 
   static compress = (matrix) => {
     let pos = 0;
+    let isChanged = false;
 
     for (let i = 0; i < 4; i++) {
       pos = 0;
@@ -153,6 +161,7 @@ class Logic {
           matrix[i][pos].innerHTML = matrix[i][j].innerHTML;
           if (j !== pos) {
             matrix[i][j].innerHTML = "";
+            isChanged = true;
           }
           pos += 1;
         }
@@ -160,10 +169,12 @@ class Logic {
       pos = 0;
     }
 
-    return matrix;
+    return { matrix, isChanged };
   };
 
   static merge = (matrix) => {
+    let isChanged = false;
+
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 3; j++) {
         if (
@@ -173,11 +184,12 @@ class Logic {
           let currentValue = parseInt(matrix[i][j].innerText) * 2;
           matrix[i][j].innerHTML = `<div>${currentValue}</div>`;
           matrix[i][j + 1].innerHTML = "";
+          isChanged = true;
         }
       }
     }
 
-    return matrix;
+    return { matrix, isChanged };
   };
 
   static reverse = (matrix) => {
@@ -194,8 +206,6 @@ class Logic {
         end -= 1;
       }
     }
-
-    return matrix;
   };
 
   static transpose = (matrix) => {
@@ -206,29 +216,31 @@ class Logic {
         matrix[j][i].innerHTML = temp;
       }
     }
-
-    return matrix;
   };
 }
 
 window.addEventListener("keydown", (event) => {
   const board = game.getBoard().getMatrix();
+  let isChangedAfterMove;
+
   switch (event.key) {
     case "ArrowUp":
-      Logic.moveBlocksToUp(board);
+      isChangedAfterMove = Logic.moveBlocksToUp(board).changeAfterMove;
       break;
     case "ArrowDown":
-      Logic.moveBlocksToDown(board);
+      isChangedAfterMove = Logic.moveBlocksToDown(board).changeAfterMove;
       break;
     case "ArrowRight":
-      Logic.moveBlocksToRight(board);
+      isChangedAfterMove = Logic.moveBlocksToRight(board).changeAfterMove;
       break;
     case "ArrowLeft":
-      Logic.moveBlocksToLeft(board);
+      isChangedAfterMove = Logic.moveBlocksToLeft(board).changeAfterMove;
       break;
   }
 
-  Logic.generateCell(board);
+  if (isChangedAfterMove) {
+    Logic.generateCell(board);
+  }
 });
 
 /* ########## START NEW GAME ########## */
