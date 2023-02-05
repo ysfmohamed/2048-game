@@ -280,6 +280,7 @@ window.addEventListener("keydown", (event) => {
 const newGameButton = document.querySelector(".newgame-button");
 newGameButton.addEventListener("click", () => {
   game.getBoard().clearGridCells();
+  Logic.getScoreNumContainer().innerText = "0";
   new Board();
 });
 
