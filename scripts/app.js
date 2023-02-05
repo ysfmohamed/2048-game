@@ -43,10 +43,10 @@ class Board {
 
     this.matrix[positions.firstTilePos.row][
       positions.firstTilePos.col
-    ].innerHTML = "<div>2</div>";
+    ].innerHTML = "<div class='c2'>2</div>";
     this.matrix[positions.secondTilePos.row][
       positions.secondTilePos.col
-    ].innerHTML = "<div>2</div>";
+    ].innerHTML = "<div class='c2'>2</div>";
   };
 
   clearGridCells = () => {
@@ -155,7 +155,7 @@ class Logic {
     }
 
     const cellContent = Random.randomCellContent();
-    matrix[pos.row][pos.col].innerHTML = `<div>${cellContent}</div>`;
+    matrix[pos.row][pos.col].innerHTML = `<div class="c${cellContent}">${cellContent}</div>`;
   };
 
   static compress = (matrix) => {
@@ -211,7 +211,7 @@ class Logic {
         ) {
           let mergedValue = parseInt(matrix[i][j].innerText) * 2;
 
-          matrix[i][j].innerHTML = `<div>${mergedValue}</div>`;
+          matrix[i][j].innerHTML = `<div class="c${mergedValue}">${mergedValue}</div>`;
           matrix[i][j + 1].innerHTML = "";
 
           updatedScoreValue = this.updateScoreValue(mergedValue);
@@ -250,6 +250,41 @@ class Logic {
       }
     }
   };
+
+  static isLose = (matrix) => {
+    if(this.isFull(matrix) && !this.isMoveable(matrix))
+      return true;
+    return false;
+  };
+
+  static isFull = (matrix) => {
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        if (matrix[i][j].innerText === "") {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  static isMoveable = (matrix) => {
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (matrix[i][j].innerText === matrix[i][j+1].innerText) {
+          return true;
+        }
+      }
+    }
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 4; j++) {
+        if (matrix[i][j].innerText === matrix[i+1][j].innerText) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }
 
 window.addEventListener("keydown", (event) => {
@@ -274,6 +309,10 @@ window.addEventListener("keydown", (event) => {
   if (isChangedAfterMove) {
     Logic.generateCell(board);
   }
+
+  if (Logic.isLose(board)) {
+    document.getElementsByClassName("gameover-message")[0].style.display = "flex";
+  }
 });
 
 /* ########## START NEW GAME ########## */
@@ -282,6 +321,7 @@ newGameButton.addEventListener("click", () => {
   game.getBoard().clearGridCells();
   Logic.getScoreNumContainer().innerText = "0";
   new Board();
+  document.getElementsByClassName("gameover-message")[0].style.display = "none";
 });
 
 /* ########## START GAME ########## */
