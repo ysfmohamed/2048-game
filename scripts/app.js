@@ -105,7 +105,11 @@ class Random {
   }
 }
 
+
+
 class Logic {
+  
+
   constructor() {}
 
   static moveBlocksToLeft = (matrix) => {
@@ -257,6 +261,20 @@ class Logic {
     return false;
   };
 
+  static iswin =(matrix) =>{
+    
+    for(let i=0;i<4;i++){
+      for(let j=0;j<4;j++){
+        if(Number(matrix[i][j].innerText)==2048)
+        {
+          //console.log(matrix[i][j].innerHTML);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   static isFull = (matrix) => {
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
@@ -287,23 +305,29 @@ class Logic {
   }
 }
 
+//x for win cases
+let x=0;
+
 window.addEventListener("keydown", (event) => {
   const board = game.getBoard().getMatrix();
   let isChangedAfterMove;
 
-  switch (event.key) {
-    case "ArrowUp":
-      isChangedAfterMove = Logic.moveBlocksToUp(board).changeAfterMove;
-      break;
-    case "ArrowDown":
-      isChangedAfterMove = Logic.moveBlocksToDown(board).changeAfterMove;
-      break;
-    case "ArrowRight":
-      isChangedAfterMove = Logic.moveBlocksToRight(board).changeAfterMove;
-      break;
-    case "ArrowLeft":
-      isChangedAfterMove = Logic.moveBlocksToLeft(board).changeAfterMove;
-      break;
+  if(x!=1){
+
+    switch (event.key) {
+      case "ArrowUp":
+        isChangedAfterMove = Logic.moveBlocksToUp(board).changeAfterMove;
+        break;
+      case "ArrowDown":
+        isChangedAfterMove = Logic.moveBlocksToDown(board).changeAfterMove;
+        break;
+      case "ArrowRight":
+        isChangedAfterMove = Logic.moveBlocksToRight(board).changeAfterMove;
+        break;
+      case "ArrowLeft":
+        isChangedAfterMove = Logic.moveBlocksToLeft(board).changeAfterMove;
+        break;
+    }
   }
 
   if (isChangedAfterMove) {
@@ -313,7 +337,24 @@ window.addEventListener("keydown", (event) => {
   if (Logic.isLose(board)) {
     document.getElementsByClassName("gameover-message")[0].style.display = "flex";
   }
+  
+  if(Logic.iswin(board)&& x==0)
+  {
+    x=1;
+    document.getElementsByClassName("win")[0].style.display="flex";
+  }
 });
+
+//continue game
+const continueGame = document.querySelector(".btn-cont");
+continueGame.addEventListener("click", () => {
+  document.getElementsByClassName("win")[0].style.display = "none";
+  x=2;
+});
+
+
+
+
 
 /* ########## START NEW GAME ########## */
 const newGameButton = document.querySelector(".newgame-button");
@@ -322,7 +363,10 @@ newGameButton.addEventListener("click", () => {
   Logic.getScoreNumContainer().innerText = "0";
   new Board();
   document.getElementsByClassName("gameover-message")[0].style.display = "none";
+  x=0;
 });
+
+
 
 /* ########## START GAME ########## */
 let game = new Game();
